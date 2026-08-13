@@ -36,7 +36,7 @@ class NotionProjectController extends BaseController
     public function saveField()
     {
         $project = $this->getProject();
-        $this->checkCSRFParam();
+        $this->checkCSRFForm();
 
         $values = $this->request->getValues();
         $errors = $this->validateField($project['id'], $values);
@@ -55,7 +55,7 @@ class NotionProjectController extends BaseController
     public function updateField()
     {
         $project = $this->getProject();
-        $this->checkCSRFParam();
+        $this->checkCSRFForm();
 
         $values = $this->request->getValues();
         $field = $this->notionFieldModel->getById($this->request->getIntegerParam('field_id'));
@@ -100,7 +100,7 @@ class NotionProjectController extends BaseController
     public function saveDeleteAction()
     {
         $project = $this->getProject();
-        $this->checkCSRFParam();
+        $this->checkCSRFForm();
 
         $this->notionDeleteActionModel->save($project['id'], $this->request->getValues());
         $this->flash->success(t('Delete action saved successfully.'));

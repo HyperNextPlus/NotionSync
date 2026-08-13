@@ -33,7 +33,9 @@ class NotionConfigController extends BaseController
 
     public function save()
     {
-        $this->checkCSRFParam();
+        // El token viaja en el cuerpo del formulario, no en la query: por eso
+        // checkCSRFForm() y no checkCSRFParam(), que lee de $_GET.
+        $this->checkCSRFForm();
         $values = $this->request->getValues();
         $errors = $this->validate($values);
 
