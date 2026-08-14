@@ -56,6 +56,44 @@ Para que `{{task_url}}` genere enlaces correctos hay que tener definido **URL de
 ajustes de Kanboard; sin ese valor, Kanboard no puede construir enlaces absolutos desde el cron y
 apuntaría a `http://localhost/`.
 
+## Cifrado del token
+
+El token de integración se guarda cifrado con **AES-256-GCM**, nunca en claro. El cifrado es
+autenticado: si el valor almacenado se altera, el descifrado falla en lugar de devolver basura.
+
+**Qué protege y qué no.** La clave vive en el servidor de aplicación, así que esto no defiende frente a
+quien ya controla ese servidor. Sí evita que el token quede legible en un volcado de la base, en una
+réplica, en un backup de MySQL o ante un acceso de solo lectura a la base — que es donde un secreto en
+claro suele acabar filtrándose.
+
+**De dónde sale la clave**, por orden de prioridad:
+
+1. La constante o variable de entorno `NOTIONSYNC_ENCRYPTION_KEY`. Es lo recomendable: mantiene la
+   clave fuera del disco de datos y permite compartirla entre varios servidores.
+
+   ```php
+   // config.php
+   define('NOTIONSYNC_ENCRYPTION_KEY', 'una cadena larga y aleatoria');
+   ```
+
+2. Si no está definida, se genera una clave de 32 bytes en
+   `data/files/notionsync/notionsync.key`, con el directorio en `0700` y el archivo en `0600`. La ruta
+   se deriva de la constante `FILES_DIR`, así que acompaña a cualquier reubicación del directorio de
+   datos. El `.htaccess` que Kanboard trae en `data/` la deja fuera del alcance del servidor web.
+
+**Cuidado con el usuario del proceso.** La clave se crea con permisos `0600`, así que solo la lee su
+propietario. Normalmente la genera el servidor web (`www-data`), de modo que el cron que ejecuta
+`notionsync:process-queue` debe correr como ese mismo usuario o como `root`; si corre como un tercero,
+no podrá descifrar el token y todas las sincronizaciones fallarán. Definir
+`NOTIONSYNC_ENCRYPTION_KEY` evita el problema de raíz, porque entonces no hay archivo.
+
+**Si se pierde la clave, el token es irrecuperable**: hay que volver a introducirlo desde la pantalla de
+configuración. Conviene incluir la clave en la copia de seguridad, guardada aparte del volcado de la
+base de datos — si viajan juntos, el cifrado deja de aportar nada.
+
+Un token guardado antes de activarse el cifrado se sigue leyendo con normalidad, la pantalla de
+configuración avisa de que está en claro, y queda cifrado la próxima vez que se guarde el formulario.
+
 ## Tipos de propiedad soportados
 
 `title`, `rich_text`, `select`, `multi_select`, `status`, `date`, `url`, `relation`.

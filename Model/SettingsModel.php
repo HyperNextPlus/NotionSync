@@ -9,13 +9,18 @@ use Kanboard\Core\Base;
  *
  * Guarda el token de integración de Notion y el database_id de la base "Tareas".
  * Ambos valores son únicos por instancia de Kanboard (regla de negocio 9).
+ *
+ * El token nunca se guarda en claro: se cifra con TokenCipher al escribir y se
+ * descifra al leer, de modo que el resto del plugin sigue trabajando con el
+ * token en claro sin enterarse.
  */
 class SettingsModel extends Base
 {
     const TABLE = 'notionsync_settings';
 
     /**
-     * Devuelve la configuración global, siempre con las dos claves presentes.
+     * Devuelve la configuración global con el token ya descifrado, siempre con
+     * las claves esperadas presentes.
      *
      * @return array
      */
@@ -31,7 +36,22 @@ class SettingsModel extends Base
             );
         }
 
+        $settings['api_token'] = $this->notionTokenCipher->decrypt($settings['api_token']);
+
         return $settings;
+    }
+
+    /**
+     * Indica si hay un token guardado todavía sin cifrar, para poder avisarlo en
+     * la pantalla de configuración.
+     *
+     * @return boolean
+     */
+    public function hasPlainTextToken()
+    {
+        $stored = $this->db->table(self::TABLE)->findOneColumn('api_token');
+
+        return ! empty($stored) && ! $this->notionTokenCipher->isEncrypted($stored);
     }
 
     /**
@@ -39,7 +59,8 @@ class SettingsModel extends Base
      *
      * Si $values['api_token'] llega vacío se conserva el token existente: el
      * formulario nunca reenvía el token en claro, solo cuando el usuario escribe
-     * uno nuevo.
+     * uno nuevo. En cualquier caso se vuelve a cifrar al escribir, así que un
+     * token heredado en claro queda cifrado al primer guardado.
      *
      * @param  array $values
      * @return boolean
@@ -51,7 +72,7 @@ class SettingsModel extends Base
         $token = isset($values['api_token']) ? trim($values['api_token']) : '';
 
         $data = array(
-            'api_token' => $token !== '' ? $token : $current['api_token'],
+            'api_token' => $this->notionTokenCipher->encrypt($token !== '' ? $token : $current['api_token']),
             'tasks_database_id' => isset($values['tasks_database_id']) ? trim($values['tasks_database_id']) : '',
             'updated_at' => time(),
         );

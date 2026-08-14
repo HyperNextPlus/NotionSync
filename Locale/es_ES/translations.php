@@ -25,6 +25,13 @@ return array(
     'Remember to share the "Tasks" database (and any related database used by relation fields) with the Notion integration. Without that permission the API replies that the database cannot be found.' => 'Recuerda compartir la base de datos "Tareas" (y cualquier base relacionada que usen los campos de tipo relación) con la integración de Notion. Sin ese permiso la API responde que no encuentra la base de datos.',
     'Check the submitted values.' => 'Revisa los datos ingresados.',
 
+    // Cifrado del token
+    'The stored token is not encrypted yet. Save this form again to encrypt it.' => 'El token guardado todavía no está cifrado. Vuelve a guardar este formulario para cifrarlo.',
+    'The Notion token could not be encrypted.' => 'No se pudo cifrar el token de Notion.',
+    'The NotionSync encryption key file is invalid: %s' => 'El archivo con la clave de cifrado de NotionSync no es válido: %s',
+    'Unable to write the NotionSync encryption key to %s' => 'No se pudo escribir la clave de cifrado de NotionSync en %s',
+    'Unable to create the NotionSync data directory: %s' => 'No se pudo crear el directorio de datos de NotionSync: %s',
+
     // Configuración por proyecto
     'Notion synchronization' => 'Sincronización con Notion',
     'The global plugin settings are missing (token and database). An administrator must complete them for synchronization to work.' => 'Falta la configuración global del plugin (token y base de datos). Un administrador debe completarla para que la sincronización funcione.',

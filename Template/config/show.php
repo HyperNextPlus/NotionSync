@@ -8,6 +8,12 @@
     </div>
 <?php endif ?>
 
+<?php if ($has_plaintext_token): ?>
+    <div class="alert alert-error">
+        <?= t('The stored token is not encrypted yet. Save this form again to encrypt it.') ?>
+    </div>
+<?php endif ?>
+
 <form method="post" action="<?= $this->url->href('NotionConfigController', 'save', array('plugin' => 'NotionSync')) ?>" autocomplete="off">
     <?= $this->form->csrf() ?>
 

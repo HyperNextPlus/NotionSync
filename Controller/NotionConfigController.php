@@ -27,6 +27,7 @@ class NotionConfigController extends BaseController
             'values' => $values,
             'errors' => $errors,
             'has_token' => $settings['api_token'] !== '',
+            'has_plaintext_token' => $this->notionSettingsModel->hasPlainTextToken(),
             'is_configured' => $this->notionSettingsModel->isConfigured(),
         )));
     }

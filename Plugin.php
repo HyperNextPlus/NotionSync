@@ -17,6 +17,7 @@ use Kanboard\Plugin\NotionSync\Service\HttpClient;
 use Kanboard\Plugin\NotionSync\Service\NotionApiClient;
 use Kanboard\Plugin\NotionSync\Service\SyncService;
 use Kanboard\Plugin\NotionSync\Service\TemplateResolver;
+use Kanboard\Plugin\NotionSync\Service\TokenCipher;
 use Kanboard\Plugin\NotionSync\Subscriber\TaskSubscriber;
 
 class Plugin extends Base
@@ -75,6 +76,10 @@ class Plugin extends Base
 
         $this->container['notionQueueModel'] = function ($c) {
             return new QueueModel($c);
+        };
+
+        $this->container['notionTokenCipher'] = function ($c) {
+            return new TokenCipher($c);
         };
 
         $this->container['notionHttpClient'] = function ($c) {
