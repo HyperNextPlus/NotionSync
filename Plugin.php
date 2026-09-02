@@ -103,6 +103,7 @@ class Plugin extends Base
     {
         $this->route->addRoute('/notionsync/settings', 'NotionConfigController', 'show', 'NotionSync');
         $this->route->addRoute('/notionsync/project/:project_id', 'NotionProjectController', 'show', 'NotionSync');
+        $this->route->addRoute('/notionsync/cron', 'NotionCronjobController', 'run', 'NotionSync');
     }
 
     /**
@@ -110,12 +111,14 @@ class Plugin extends Base
      * administrador. El mapeo de campos vive dentro de un proyecto y sigue la
      * convención de la pantalla "Integraciones" del core: manager del proyecto.
      * El reintento manual queda al alcance de cualquiera que pueda ver la tarea.
+     * El cron por URL es la excepción: es público y su control de acceso es el token, no un rol.
      */
     private function registerAccessControl()
     {
         $this->applicationAccessMap->add('NotionConfigController', '*', Role::APP_ADMIN);
         $this->projectAccessMap->add('NotionProjectController', '*', Role::PROJECT_MANAGER);
         $this->projectAccessMap->add('NotionTaskController', '*', Role::PROJECT_VIEWER);
+        $this->applicationAccessMap->add('NotionCronjobController', array('run'), Role::APP_PUBLIC);
     }
 
     private function registerListeners()

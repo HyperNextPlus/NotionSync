@@ -124,6 +124,16 @@ return array(
     'No pending synchronizations.' => 'No hay sincronizaciones pendientes.',
     'Processed: %d | Synced: %d | Failed: %d' => 'Procesados: %d | Sincronizados: %d | Con error: %d',
 
+    // Procesamiento de la cola
+    'Queue processing' => 'Procesamiento de la cola',
+    'The plugin only queues changes: the calls to Notion are made by the queue processor, which has to be triggered periodically.' => 'El plugin solo encola los cambios: las llamadas a Notion las hace el procesador de la cola, que hay que disparar periódicamente.',
+    'From the command line' => 'Desde la línea de comandos',
+    'From a URL' => 'Desde una URL',
+    'For hosting providers that do not allow running commands from the command line. Both forms are equivalent; the second one does not require URL rewriting.' => 'Para alojamientos que no permiten ejecutar comandos por consola. Las dos formas son equivalentes; la segunda no necesita reescritura de URLs.',
+    'The token is the global webhook token of Kanboard, in Settings &gt; Webhooks. Resetting it there also invalidates these URLs.' => 'El token es el token global de webhooks de Kanboard, en Configuración &gt; Webhooks. Regenerarlo allí invalida también estas URLs.',
+    'Optional parameters: &limit=N (jobs per run, 20 by default) and &delay=N (pause in milliseconds between calls to Notion, 350 by default).' => 'Parámetros opcionales: &limit=N (trabajos por ejecución, 20 por defecto) y &delay=N (pausa en milisegundos entre llamadas a Notion, 350 por defecto).',
+    'This instance has no webhook token, so the URL is disabled. Generate one in Settings &gt; Webhooks.' => 'Esta instancia no tiene token de webhooks, así que la URL está deshabilitada. Genera uno en Configuración &gt; Webhooks.',
+
     // Descripción del plugin
     'Creates and keeps Kanboard tasks synchronized as pages in a Notion database.' => 'Crea y mantiene sincronizadas las tareas de Kanboard como páginas en una base de datos de Notion.',
 );

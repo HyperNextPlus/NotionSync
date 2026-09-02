@@ -41,3 +41,32 @@
         <button type="submit" class="btn btn-blue"><?= t('Save') ?></button>
     </div>
 </form>
+
+<div class="page-header margin-top">
+    <h2><?= t('Queue processing') ?></h2>
+</div>
+
+<div class="panel">
+    <p><?= t('The plugin only queues changes: the calls to Notion are made by the queue processor, which has to be triggered periodically.') ?></p>
+
+    <h3><?= t('From the command line') ?></h3>
+    <pre>*/5 * * * * cd <?= $this->text->e(realpath(ROOT_DIR)) ?> &amp;&amp; ./cli notionsync:process-queue &gt;/dev/null 2&gt;&amp;1</pre>
+
+    <h3><?= t('From a URL') ?></h3>
+    <p><?= t('For hosting providers that do not allow running commands from the command line. Both forms are equivalent; the second one does not require URL rewriting.') ?></p>
+
+    <?php if ($has_webhook_token): ?>
+        <pre><?= $this->text->e($cron_pretty_url) ?></pre>
+        <pre><?= $this->text->e($cron_query_url) ?></pre>
+        <p class="form-help">
+            <?= t('The token is the global webhook token of Kanboard, in Settings &gt; Webhooks. Resetting it there also invalidates these URLs.') ?>
+        </p>
+        <p class="form-help">
+            <?= t('Optional parameters: &limit=N (jobs per run, 20 by default) and &delay=N (pause in milliseconds between calls to Notion, 350 by default).') ?>
+        </p>
+    <?php else: ?>
+        <div class="alert alert-error">
+            <?= t('This instance has no webhook token, so the URL is disabled. Generate one in Settings &gt; Webhooks.') ?>
+        </div>
+    <?php endif ?>
+</div>

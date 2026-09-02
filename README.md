@@ -127,7 +127,10 @@ ese archivo la interfaz cae en inglés, que es el texto fuente.
 
 ## Procesamiento en segundo plano
 
-Los hooks solo encolan; las llamadas a Notion las hace el comando CLI:
+Los hooks solo encolan; las llamadas a Notion las hace el procesador de la cola, que hay que disparar
+periódicamente. Se puede hacer por consola o por URL, según lo que permita el alojamiento.
+
+### Desde la línea de comandos
 
 ```
 ./cli notionsync:process-queue
@@ -141,6 +144,44 @@ Ejemplo de cron cada cinco minutos:
 
 Opciones: `--limit` (trabajos por ejecución, 50 por defecto) y `--delay` (pausa en milisegundos entre
 llamadas, 350 por defecto), pensadas para no agotar el límite de peticiones de Notion.
+
+### Desde una URL
+
+Para alojamientos que no permiten ejecutar procesos por consola, la misma cola se procesa por HTTP.
+Sigue el patrón del cron por URL del core (`CronjobController`): ruta pública autenticada con el
+**token global de webhooks** de Kanboard, el mismo que aparece en *Configuración → Webhooks*.
+
+```
+https://domain.tld/notionsync/cron?token=TOKEN
+https://domain.tld/?controller=NotionCronjobController&action=run&plugin=NotionSync&token=TOKEN
+```
+
+Las dos formas son equivalentes y llaman a la misma acción. La primera necesita que la reescritura de
+URLs esté activa (`ENABLE_URL_REWRITE`); la segunda funciona siempre. Ambas aparecen ya montadas, con
+el token real, en *Configuración → NotionSync*.
+
+Se disparan con cualquier cliente HTTP, sea el cron del panel del alojamiento o un servicio externo:
+
+```
+*/5 * * * * wget -q -O - "https://domain.tld/notionsync/cron?token=TOKEN" >/dev/null 2>&1
+```
+
+Parámetros opcionales en la query: `limit` y `delay`, equivalentes a las opciones de la CLI. Por
+defecto el límite es **20**, no 50: la consola no tiene tope de tiempo pero una petición HTTP sí, y
+`max_execution_time` suele estar en 30 s justo en los alojamientos que obligan a usar esta ruta. Con
+20 trabajos y 350 ms de pausa se acumulan 7 s, quedando margen para las llamadas a Notion. Si el
+alojamiento permite `set_time_limit()`, el controlador lo levanta.
+
+Que la petición se corte por tiempo no rompe nada: cada trabajo se confirma en la base en cuanto
+termina, así que lo ya sincronizado queda hecho y el resto lo recoge la siguiente pasada.
+
+La respuesta es `text/plain` con la salida del comando —incluida la línea
+`Procesados | Sincronizados | Con error`— porque un cron por URL no tiene stdout donde mirar. El
+código HTTP es `200` siempre que el endpoint haya podido ejecutarse, y `403` si el token no coincide;
+un trabajo fallido **no** devuelve error HTTP, para que una incidencia pasajera de Notion no dispare
+las alertas del monitor: el reintento ya lo cubre la siguiente ejecución.
+
+Si la instancia no tiene `webhook_token`, la URL responde `403` en lugar de quedar abierta.
 
 ## Nota sobre la eliminación de tareas
 
