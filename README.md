@@ -139,7 +139,7 @@ periódicamente. Se puede hacer por consola o por URL, según lo que permita el 
 Ejemplo de cron cada cinco minutos:
 
 ```
-*/5 * * * * cd /var/www/html/kanboard.hypernextplus.com && ./cli notionsync:process-queue >/dev/null 2>&1
+*/5 * * * * cd /path/to/kanboard && ./cli notionsync:process-queue >/dev/null 2>&1
 ```
 
 Opciones: `--limit` (trabajos por ejecución, 50 por defecto) y `--delay` (pausa en milisegundos entre
